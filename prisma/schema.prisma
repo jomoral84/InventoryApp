@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  username     String     @unique
+  passwordHash String
+  role         String     @default("user")
+  delegacion   String
+  nombre       String?
+  apellido     String?
+  email        String?
+  telefono     String?
+  createdAt    DateTime   @default(now())
+  items        Item[]
+  auditLogs    AuditLog[]
+}
+
+model Item {
+  id         String   @id @default(cuid())
+  tipo       String
+  delegacion String
+  createdAt  DateTime @default(now())
+
+  userId   String
+  username String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  dominio          String?
+  marca            String?
+  modelo           String?
+  anio             String?
+  kilometros       String?
+  matafuegos       String?
+  rto              String?
+  fotoUrl          String?
+  nroSerie         String?
+  fechaVencimiento String?
+  nroSistemas      String?
+  nroLinea         String?
+  empresa          String?
+  asignadaA        String?
+  dispositivo      String?
+  estado           String?
+  observaciones    String?
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  accion      String   // "alta" | "edicion" | "eliminacion"
+  descripcion String   // texto legible: "Se modificó el estado a Operativo"
+  delegacion  String
+  itemId      String?
+  itemTipo    String?
+  itemRef     String?  // identificador legible: dominio, nroSerie, etc.
+  userId      String
+  username    String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item        Item?    @relation(fields: [itemId], references: [id], onDelete: SetNull)
+}
+
+model Config {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
