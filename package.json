@@ -5,11 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npx prisma migrate deploy && npx prisma generate && next start",
     "db:migrate": "prisma migrate dev --name init",
     "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate",
     "start:prod": "sh scripts/start-prod.sh",
     "db:deploy": "prisma migrate deploy"
   },
