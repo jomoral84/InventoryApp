@@ -92,7 +92,7 @@ export default function LoginPage() {
                 className="text-5xl font-bold text-white leading-tight mb-6"
                 style={{ fontFamily: 'IBM Plex Sans Condensed, sans-serif' }}
               >
-                Control de<br />Activos<br />Institucionales
+                Sistema de<br />Inventario<br />Delegaciones Regionales
               </h1>
               <p className="text-blue-200 text-lg leading-relaxed max-w-sm">
                 Gestión centralizada de móviles, alcoholímetros, dispositivos móviles e informática de todas las delegaciones.
@@ -196,25 +196,6 @@ export default function LoginPage() {
                   {submitting ? 'Ingresando...' : 'Iniciar sesión'}
                 </button>
               </form>
-
-              <div
-                className="mt-8 p-4 rounded-xl border"
-                style={{
-                  background: isDark ? '#0f172a' : '#eff6ff',
-                  borderColor: isDark ? '#1e3a8a' : '#dbeafe',
-                }}
-              >
-                <p
-                  className="text-xs font-semibold mb-2 uppercase tracking-wider"
-                  style={{ color: isDark ? '#60a5fa' : '#60a5fa' }}
-                >
-                  Credenciales de prueba
-                </p>
-                <div className="space-y-1 text-xs" style={{ color: isDark ? '#93c5fd' : '#1e40af' }}>
-                  <p><span className="font-medium">Admin:</span> admin / admin123</p>
-                  <p><span className="font-medium">Usuario:</span> usuario1 / user123</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
