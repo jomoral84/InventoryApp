@@ -30,16 +30,29 @@ const TIPO_COLOR: Record<TipoItem, string> = {
 // ── Transporter ───────────────────────────────────────────────────────────
 
 function createTransporter() {
-  const service = process.env.SMTP_SERVICE || 'gmail'
-  const user    = process.env.SMTP_USER
-  const pass    = process.env.SMTP_PASS
+  const apiKey = process.env.RESEND_API_KEY
+  const user = process.env.SMTP_USER
+  const pass = process.env.SMTP_PASS
 
+  // Resend (prioridad si está configurado)
+  if (apiKey) {
+    return nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'resend',
+        pass: apiKey,
+      },
+    })
+  }
+
+  // Fallback: SMTP genérico (Gmail, Outlook, etc.)
   if (!user || !pass) {
-    console.warn('[Email] SMTP_USER o SMTP_PASS no configurados — el email no se enviará.')
+    console.warn('[Email] Sin credenciales SMTP configuradas — el email no se enviará.')
     return null
   }
 
-  // Soporte para servidor SMTP personalizado (SMTP_HOST + SMTP_PORT)
   if (process.env.SMTP_HOST) {
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -50,7 +63,7 @@ function createTransporter() {
   }
 
   return nodemailer.createTransport({
-    service,
+    service: process.env.SMTP_SERVICE || 'gmail',
     auth: { user, pass },
   })
 }
@@ -269,7 +282,7 @@ export async function sendNewItemNotification(item: any, username: string): Prom
 
   try {
     await transporter.sendMail({
-      from: `"${process.env.EMAIL_FROM_NAME || 'CNRT Inventario'}" <${process.env.SMTP_USER}>`,
+      from: `"${process.env.EMAIL_FROM_NAME || 'CNRT Inventario'}" <${process.env.EMAIL_FROM_ADDRESS || process.env.SMTP_USER}>`,
       to: adminEmail,
       subject: `${icon} Nuevo ${label} — ${item.delegacion} (${username})`,
       text: textBody,
