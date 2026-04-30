@@ -8,17 +8,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const payload = requireAdmin(req, res)
   if (!payload) return
 
-  const adminEmail = process.env.ADMIN_EMAIL
-  const smtpUser   = process.env.SMTP_USER
-  const smtpPass   = process.env.SMTP_PASS
+  const adminEmailRaw = process.env.ADMIN_EMAIL
 
-  if (!adminEmail || !smtpUser || !smtpPass) {
+  // Verificar que hay al menos una forma de enviar emails configurada
+  const tieneResend = !!process.env.RESEND_API_KEY
+  const tieneSMTP = !!(process.env.SMTP_USER && process.env.SMTP_PASS)
+
+  if (!adminEmailRaw) {
     return res.status(400).json({
-      error: 'Configuración incompleta. Verificá ADMIN_EMAIL, SMTP_USER y SMTP_PASS en el archivo .env',
+      error: 'Falta configurar ADMIN_EMAIL en las variables de entorno de Railway.',
     })
   }
 
-  // Enviar un email de prueba con un item ficticio
+  if (!tieneResend && !tieneSMTP) {
+    return res.status(400).json({
+      error: 'Falta configurar RESEND_API_KEY (recomendado) o SMTP_USER + SMTP_PASS en Railway.',
+    })
+  }
+
   const fakeItem = {
     id: 'test-001',
     tipo: 'movil',
@@ -39,7 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await sendNewItemNotification(fakeItem, payload.username)
     return res.status(200).json({
       success: true,
-      message: `Email de prueba enviado a ${adminEmail}`,
+      message: `Email de prueba enviado a ${adminEmailRaw}`,
+      servicio: tieneResend ? 'Resend' : 'SMTP',
     })
   } catch (err: any) {
     return res.status(500).json({
